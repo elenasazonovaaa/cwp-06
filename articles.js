@@ -6,9 +6,11 @@ const validator = require('./validator.js');
 class Articles {
 
     readAll(req, res, data, cb) {
-        let forSort = validator.isValid(req, res, data, cb);
-        Sort(forSort);
-        cb(null, articles);
+        let parameters = validator.isValid(req, res, data, cb);
+        cb(null, Sort(parameters, function (data){
+            let ret = JSON.parse(JSON.stringify(articles));
+            return ret.splice((data.page - 1)*data.limit, data.limit);
+        }));
     };
 
     read(req, res, data, cb) {
@@ -60,7 +62,7 @@ function updateArticles() {
         if (err) console.log(err);
     });
 }
-function Sort(data) {
+function Sort(data, callback) {
     switch (data.sortField) {
         case 'comments': {
             if (data.sortOrder === 'desc')
@@ -91,5 +93,6 @@ function Sort(data) {
             ;
             break;
     }
+    return callback(data);
 }
 exports.Articles = Articles;
