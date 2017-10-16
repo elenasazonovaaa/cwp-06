@@ -7,10 +7,16 @@ class Articles {
 
     readAll(req, res, data, cb) {
         let parameters = validator.isValid(req, res, data, cb);
-        cb(null, Sort(parameters, function (data){
+        cb(null,{
+            "items": Sort(parameters, function (data){
             let ret = JSON.parse(JSON.stringify(articles));
             return ret.splice((data.page - 1)*data.limit, data.limit);
-        }));
+        }), "meta": {
+                "page": parameters.page,
+                "pages": Math.ceil(articles.length/parameters.limit),
+                "count": articles.length,
+                "limit": parameters.limit
+        } });
     };
 
     read(req, res, data, cb) {
